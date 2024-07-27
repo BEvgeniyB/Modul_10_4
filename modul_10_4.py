@@ -9,17 +9,17 @@ class Table:
     def __init__(self, num):
         self.num = num
         self.is_busy = True
-        self.time = 0
+        self.start = 0
         self.guest = ''
 
     def condition(self, args):
         if args[0]:
             self.guest = ""
-            self.time = 0
+            self.start = 0
             self.is_busy = True
         else:
             self.guest = args[1]
-            self.time = 1
+            self.start = args[2]
             self.is_busy = False
 
 
@@ -51,7 +51,7 @@ class Cafe:
                         guest_queue = queue.get()
                         if guest_new != guest_queue:
                             print(f'Текущее время : {current_time} / {guest_new.names} ожидает свободный стол')
-                        table.condition((False, guest_queue.names))
+                        table.condition((False, guest_queue.names,current_time))
                         print(f"Текущее время : {current_time} / {guest_queue.names} сел за стол № {table.num}. (начало обслуживания)")
                         found = True
                         break
@@ -63,7 +63,7 @@ class Cafe:
                 guest_queue = queue.get()
                 for table in self.tables:
                     if table.is_busy:
-                        table.condition((False, guest_queue.names))
+                        table.condition((False, guest_queue.names,current_time))
                         print(f"Текущее время : {current_time} / {guest_queue.names} сел за стол № {table.num}. (начало обслуживания)")
                         break
             else:
@@ -78,8 +78,7 @@ class Cafe:
     def serve_customer(self,current_time):
         for table in self.tables:
             if not table.is_busy:
-                table.time += 1
-                if table.time == 5:
+                if current_time - table.start == 5:
                     print(f'Текущее время : {current_time}  /{table.guest} покушал и ушёл.')
                     table.condition((True,))
 
